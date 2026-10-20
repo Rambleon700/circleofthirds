@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circle of Thirds Explorer & Masterclass</title>
+    <style>
+        :root {
+            --bg-dark: #090d16;
+            --bg-card: #131b2e;
+            --bg-card-hover: #1c2842;
+            --border-color: #2a3b5c;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            
+            --color-root: #06b6d4;      /* Cyan */
+            --color-maj3: #f59e0b;      /* Gold/Amber */
+            --color-min3: #ec4899;      /* Coral Pink */
+            --color-fifth: #10b981;     /* Emerald Green */
+            --color-dim: #a855f7;       /* Violet */
+            --color-accent: #38bdf8;    /* Light Blue */
+            
+            --fret-wire: #64748b;
+            --wood-dark: #0f172a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navigation Bar */
+        .app-navbar {
+            background-color: #060a12;
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            height: 60px;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 1.15rem;
+            background: linear-gradient(90deg, #38bdf8, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            height: 100%;
+        }
+
+        .nav-tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 0 16px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s ease;
+            height: 100%;
+        }
+
+        .nav-tab-btn:hover {
+            color: var(--text-main);
+            background-color: rgba(255,255,255,0.03);
+        }
+
+        .nav-tab-btn.active {
+            color: var(--color-accent);
+            border-bottom-color: var(--color-accent);
+            background-color: rgba(56, 189, 248, 0.05);
+        }
+
+        /* View Container Switching */
+        .view-page {
+            display: none;
+            padding: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+            flex: 1;
+        }
+
+        .view-page.active-view {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Interactive Page Layout */
+        .explorer-grid {
+            display: grid;
+            grid-template-columns: 420px 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 1100px) {
+            .explorer-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Buttons & Form Elements */
+        button {
+            background-color: #0284c7;
+            color: #ffffff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        button:hover {
+            background-color: #0369a1;
+            transform: translateY(-1px);
+        }
+
+        button.btn-secondary {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+        }
+
+        button.btn-secondary:hover {
+            background-color: var(--bg-card-hover);
+        }
+
+        select, input[type="number"] {
+            background-color: var(--bg-card);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            outline: none;
+            cursor: pointer;
+        }
+
+        select:focus {
+            border-color: var(--color-accent);
+        }
+
+        /* Panels & Cards */
+        .panel {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .panel-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .control-group label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        /* SVG Wheel Styles */
+        .wheel-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            background: radial-gradient(circle, rgba(19,27,46,1) 0%, rgba(9,13,22,1) 100%);
+            border-radius: 10px;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        #thirds-wheel {
+            width: 100%;
+            max-width: 380px;
+            height: auto;
+            user-select: none;
+        }
+
+        .wheel-node {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .wheel-node:hover circle {
+            fill-opacity: 0.9;
+            stroke-width: 3px;
+        }
+
+        .wheel-label {
+            font-size: 13px;
+            font-weight: 800;
+            font-family: monospace;
+            fill: #ffffff;
+            text-anchor: middle;
+            dominant-baseline: central;
+            pointer-events: none;
+        }
+
+        .cycle-link-path {
+            fill: none;
+            stroke-width: 3.5px;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: all 0.4s ease;
+        }
+
+        /* Fretboard Visualizer */
+        .fretboard-wrapper {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 16px;
+            overflow-x: auto;
+        }
+
+        .fretboard-container {
+            min-width: 1300px;
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+        }
+
+        .fret-numbers {
+            display: flex;
+            padding-left: 40px;
+            margin-bottom: 6px;
+            font-family: monospace;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .fret-number-cell {
+            flex: 1;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .fret-number-cell.nut {
+            width: 40px;
+            flex: none;
+        }
+
+        .neck {
+            position: relative;
+            background-color: var(--wood-dark);
+            border-top: 3px solid var(--fret-wire);
+            border-bottom: 3px solid var(--fret-wire);
+            border-radius: 4px;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
+        }
+
+        .strings-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            z-index: 2;
+        }
+
+        .string-row {
+            display: flex;
+            align-items: center;
+            height: 36px;
+            position: relative;
+        }
+
+        .string-wire {
+            position: absolute;
+            left: 40px;
+            right: 0;
+            background: linear-gradient(0deg, #94a3b8, #cbd5e1);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .tuning-label {
+            width: 40px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: #f1f5f9;
+            background-color: #060a12;
+            border-right: 4px solid var(--color-maj3);
+            z-index: 3;
+        }
+
+        .fret-cell {
+            flex: 1;
+            height: 100%;
+            border-right: 2px solid var(--fret-wire);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+
+        .fret-cell.nut-cell {
+            width: 40px;
+            flex: none;
+            background-color: rgba(255,255,255,0.03);
+            border-right: 4px solid var(--color-maj3);
+        }
+
+        .inlay-layer {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 40px;
+            right: 0;
+            pointer-events: none;
+            z-index: 1;
+            display: flex;
+        }
+
+        .inlay-cell {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .inlay-dot {
+            width: 9px;
+            height: 9px;
+            background-color: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+        }
+
+        .inlay-double {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .note-badge {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            font-family: monospace;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.6);
+            transition: transform 0.15s ease;
+            z-index: 4;
+            border: 1px solid rgba(255,255,255,0.4);
+            color: #ffffff;
+        }
+
+        .note-badge:hover {
+            transform: scale(1.25);
+            z-index: 10;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 12px;
+        }
+
+        .chord-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .chord-card:hover {
+            border-color: var(--color-accent);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-weight: 800;
+            font-size: 1rem;
+            color: var(--text-main);
+        }
+
+        .card-tag {
+            font-size: 0.7rem;
+            background-color: var(--bg-dark);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: var(--color-accent);
+            font-family: monospace;
+            border: 1px solid var(--border-color);
+        }
+
+        .card-body {
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* PAGE 2: TUTORIAL STYLING */
+        .tutorial-container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 25px;
+            align-items: start;
+        }
+
+        @media (max-width: 900px) {
+            .tutorial-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .tutorial-sidebar {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            position: sticky;
+            top: 80px;
+        }
+
+        .toc-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .toc-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            padding: 6px 10px;
+            border-radius: 6px;
+            display: block;
+            transition: all 0.2s ease;
+        }
+
+        .toc-link:hover {
+            color: var(--text-main);
+            background-color: var(--bg-card-hover);
+        }
+
+        .tutorial-content {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .tutorial-section {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            scroll-margin-top: 80px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+        }
+
+        .section-num {
+            background: linear-gradient(135deg, #0284c7, #a855f7);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .section-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .tutorial-text {
+            color: #cbd5e1;
+            line-height: 1.75;
+            font-size: 0.95rem;
+        }
+
+        .diagram-box {
+            background-color: #090d16;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 8px 0;
+        }
+
+        .diagram-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--color-accent);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .tab-box {
+            font-family: monospace;
+            white-space: pre;
+            background-color: #04070d;
+            color: #38bdf8;
+            padding: 14px;
+            border-radius: 6px;
+            border: 1px solid #1e293b;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            overflow-x: auto;
+        }
+
+        .demo-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #0b1220;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-top: 6px;
+        }
+
+        .demo-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .demo-title {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--text-main);
+        }
+
+        .demo-sub {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Main Navigation Bar -->
+    <nav class="app-navbar">
+        <div class="nav-brand">
+            <span>🌀</span> Circle of Thirds Suite
+        </div>
+        <div class="nav-tabs">
+            <button class="nav-tab-btn active" id="tab-tool" onclick="switchTab('tool')">
+                <span>🎛️</span> Interactive Visualizer
+            </button>
+            <button class="nav-tab-btn" id="tab-tutorial" onclick="switchTab('tutorial')">
+                <span>📚</span> Masterclass Tutorial
+            </button>
+        </div>
+    </nav>
+
+    <!-- PAGE 1: INTERACTIVE TOOL -->
+    <main id="page-tool" class="view-page active-view">
+        <div class="explorer-grid">
+            
+            <!-- Left Control Column -->
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+                <div class="panel">
+                    <div class="panel-title">
+                        <span>Cycle Parameters</span>
+                        <span id="bpm-badge" style="font-size: 0.75rem; color: var(--color-accent);">120 BPM</span>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="select-root">Root Key</label>
+                        <select id="select-root"></select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="select-mode">Thirds System / Framework</label>
+                        <select id="select-mode">
+                            <option value="maj3">Major 3rd Cycles (Coltrane / Augmented)</option>
+                            <option value="min3">Minor 3rd Cycles (Diminished 7th / Octatonic)</option>
+
+                            <option value="chromatic_mediant">Chromatic Mediants (Film Scoring)</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group" id="subcycle-group">
+                        <label for="select-subcycle">Specific Sub-Cycle</label>
+                        <select id="select-subcycle"></select>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; margin-top: 4px;">
+                        <button id="btn-play-cycle" style="flex: 1;">▶ Play Cycle</button>
+                        <button id="btn-arpeggio" class="btn-secondary" style="flex: 1;">📈 Arp</button>
+                    </div>
+
+                    <div class="control-group" style="margin-top: 6px;">
+                        <label>Tempo Control (BPM)</label>
+                        <input type="range" id="tempo-slider" min="60" max="220" value="120" style="accent-color: var(--color-accent);">
+                    </div>
+                </div>
+
+                <!-- SVG Wheel Panel -->
+                <div class="wheel-container">
+                    <svg id="thirds-wheel" viewBox="0 0 300 300"></svg>
+                </div>
+            </div>
+
+            <!-- Right Column: Fretboard & Chord Details -->
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+                <div class="panel">
+                    <div class="panel-title">
+                        <span id="cycle-title-text">Coltrane Major 3rd Cycle</span>
+                        <span id="cycle-formula-text" style="font-size: 0.8rem; font-family: monospace; color: var(--color-maj3);">C - E - G#</span>
+                    </div>
+                    <p id="cycle-description-text" style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
+                        Divides the 12-semitone octave symmetrically into 3 equal parts of 4 semitones (Major 3rds). Forms the bedrock of John Coltrane's "Giant Steps" harmonic matrix.
+                    </p>
+                </div>
+
+                <!-- Fretboard -->
+                <div class="fretboard-wrapper">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span style="font-weight: 700; font-size: 0.9rem;">Guitar Fretboard Mapping (24 Frets)</span>
+                        <div style="display: flex; gap: 12px; font-size: 0.75rem;">
+                            <span style="color: var(--color-root);">● Root</span>
+                            <span style="color: var(--color-maj3);">● Major 3rd</span>
+                            <span style="color: var(--color-min3);">● Minor 3rd</span>
+                            <span style="color: var(--color-fifth);">● Perfect 5th</span>
+                            <span style="color: var(--color-dim);">● Diminished 7th / Alt</span>
+                        </div>
+                    </div>
+                    <div class="fretboard-container">
+                        <div class="fret-numbers" id="fret-numbers"></div>
+                        <div class="neck">
+                            <div class="inlay-layer" id="inlay-layer"></div>
+                            <div class="strings-container" id="strings-container"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Generated Chord Cards Grid -->
+                <div class="panel">
+                    <div class="panel-title">
+                        <span>Associated Chords & Voicings</span>
+                        <span style="font-size: 0.75rem; color: var(--text-muted);" id="cards-count">0 Voicings</span>
+                    </div>
+                    <div class="cards-grid" id="cards-grid"></div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- PAGE 2: MASTERCLASS TUTORIAL -->
+    <main id="page-tutorial" class="view-page">
+        <div class="tutorial-container">
+            
+            <!-- Sidebar Index -->
+            <aside class="tutorial-sidebar">
+                <div style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+                    Masterclass Guide
+                </div>
+                <ul class="toc-list">
+                    <li><a href="#t-sec-1" class="toc-link">1. Circle of Thirds vs. Fifths</a></li>
+                    <li><a href="#t-sec-2" class="toc-link">2. Symmetrical Geometry</a></li>
+                    <li><a href="#t-sec-3" class="toc-link">3. Coltrane Changes & Matrix</a></li>
+                    <li><a href="#t-sec-4" class="toc-link">4. Chromatic Mediants in Film</a></li>
+                    <li><a href="#t-sec-5" class="toc-link">5. Fretboard Implementation</a></li>
+                    <li><a href="#t-sec-6" class="toc-link">6. Interactive Sound Demos</a></li>
+                    <li><a href="#t-sec-7" class="toc-link">7. Daily Practice Routines</a></li>
+                </ul>
+            </aside>
+
+            <!-- Content Area -->
+            <div class="tutorial-content">
+
+                <!-- Section 1 -->
+                <section id="t-sec-1" class="tutorial-section">
+                    <div class="section-header">
+                        <div class="section-num">1</div>
+                        <h2 class="section-title">What is the Circle of Thirds?</h2>
+                    </div>
+                    <p class="tutorial-text">
+                        While the traditional <strong>Circle of Fifths</strong> organizes the 12 chromatic notes by steps of 7 semitones (Perfect 5ths) to establish diatonic key signatures, the <strong>Circle of Thirds</strong> organizes musical space by interval steps of <strong>3 semitones (Minor 3rds)</strong> or <strong>4 semitones (Major 3rds)</strong>.
+                    </p>
+                    <p class="tutorial-text">
+                        By moving in thirds rather than fifths, harmony breaks free from traditional root movement (like V - I cadences) and enters symmetrical pitch space. This forms the foundation for modern jazz modulation, romantic era classical composition, and cinematic film scoring.
+                    </p>
+                </section>
+
+                <!-- Section 2 -->
+                <section id="t-sec-2" class="tutorial-section">
+                    <div class="section-header">
+                        <div class="section-num">2</div>
+                        <h2 class="section-title">The Symmetrical Geometry of Pitch Space</h2>
+                    </div>
+                    <p class="tutorial-text">
+                        The 12-tone equal temperament system can be evenly divided into geometric polygons based on thirds:
+                    </p>
+                    <div class="diagram-box">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
+                            <div style="background:#060a12; padding:12px; border-radius:6px; border:1px solid var(--border-color);">
+                                <strong style="color:var(--color-maj3);">Major 3rd Cycles (Equilateral Triangles)</strong>
+                                <p style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">
+                                    4 semitones × 3 steps = 12 semitones (1 Octave). Forms 4 distinct augmented triad families (e.g. C - E - G#).
+                                </p>
+                            </div>
+                            <div style="background:#060a12; padding:12px; border-radius:6px; border:1px solid var(--border-color);">
+                                <strong style="color:var(--color-min3);">Minor 3rd Cycles (Squares)</strong>
+                                <p style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">
+                                    3 semitones × 4 steps = 12 semitones (1 Octave). Forms 3 distinct diminished 7th families (e.g. C - Eb - Gb - A).
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 3 -->
+                <section id="t-sec-3" class="tutorial-section">
+                    <div class="section-header">
+                        <div class="section-num">3</div>
+                        <h2 class="section-title">Coltrane Changes & Harmonic Substitution</h2>
+                    </div>
+                    <p class="tutorial-text">
+                        In 1959, saxophonist John Coltrane revolutionized jazz harmony with his composition <strong>"Giant Steps"</strong>. Coltrane substituted standard ii - V - I progressions with key centers moving rapidly in major thirds.
+                    </p>
+                    <div class="diagram-box">
+                        <div class="diagram-title">The Giant Steps Matrix (3 Tonal Centers: B, G, Eb)</div>
+                        <div class="tab-box">
+|  Bmaj7   D7  |  Gmaj7   Bb7  |  Ebmaj7      |  A-7   D7  |
+|  Gmaj7   Bb7 |  Ebmaj7  F#7  |  Bmaj7       |  F#-7  B7  |
+                        </div>
+                    </div>
+                    <p class="tutorial-text">
+                        Notice how the major chords (Bmaj7 → Gmaj7 → Ebmaj7) outline a major 3rd cycle, dividing the octave into three equal points.
+                    </p>
+                </section>
+
+                <!-- Section 4 -->
+                <section id="t-sec-4" class="tutorial-section">
+                    <div class="section-header">
+                        <div class="section-num">4</div>
+                        <h2 class="section-title">Chromatic Mediants in Film Scoring</h2>
+                    </div>
+                    <p class="tutorial-text">
+                        A <strong>chromatic mediant</strong> relationship occurs between two chords whose roots are a major or minor 3rd apart and share the same chord quality (e.g., C Major to E Major, or C Major to Ab Major).
+                    </p>
+                    <p class="tutorial-text">
+                        Because these chords share exactly one voice-led note (the common tone) while changing key centers drastically, they produce a sense of wonder, heroic triumph, or mysterious depth. This is heavily utilized in film scores like <em>Star Wars</em>, <em>Inception</em>, and <em>Lord of the Rings</em>.
+                    </p>
+                </section>
+
+                <!-- Section 5 -->
+                <section id="t-sec-5" class="tutorial-section">
+                    <div class="section-header">
+                        <div class="section-num">5</div>
+                        <h2 class="section-title">Guitar Fretboard Implementation</h2>
+                    </div>
+                    <p class="tutorial-text">
+                        On guitar, major 3rds move 4 frets along a single string (or diagonal shapes across adjacent strings). Because the B string is tuned a major 3rd above G, major 3rd cycles create clean vertical stack patterns across strings 3 and 2!
+                    </p>
+                </section>
+
+                <!-- Section 6 -->
+                <section id="t-sec-6" class="tutorial-section">
+                    <div class="section-header">
+                        <div class="section-num">6</div>
+                        <h2 class="section-title">Interactive Sound Demos</h2>
+                    </div>
+
+                    <div class="demo-bar">
+                        <div class="demo-info">
+                            <div class="demo-title">1. Coltrane "Giant Steps" Cycle Demo</div>
+                            <div class="demo-sub">Bmaj7 → D7 → Gmaj7 → Bb7 → Ebmaj7</div>
+                        </div>
+                        <button onclick="playDemoColtrane()">▶ Play Demo</button>
+                    </div>
+
+                    <div class="demo-bar">
+                        <div class="demo-info">
+                            <div class="demo-title">2. Film Score Chromatic Mediant Demo</div>
+                            <div class="demo-sub">C Major → E Major → Ab Major → C Major</div>
+                        </div>
+                        <button onclick="playDemoFilm()">▶ Play Demo</button>
+                    </div>
+                </section>
+
+                <!-- Section 7 -->
+                <section id="t-sec-7" class="tutorial-section">
+                    <div class="section-header">
+                        <div class="section-num">7</div>
+                        <h2 class="section-title">Practice Routines & Exercises</h2>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:12px;">
+                        <div style="background:#060a12; padding:12px; border-radius:6px; border:1px solid var(--border-color);">
+                            <strong style="color:var(--text-main);">Drill 1: Augmented Triad String Sweeps</strong>
+                            <p style="font-size:0.85rem; color:var(--text-muted); margin-top:4px;">
+                                Play C - E - G# arpeggios up the neck, shifting up 4 frets for each inversion on the top 3 strings.
+                            </p>
+                        </div>
+                        <div style="background:#060a12; padding:12px; border-radius:6px; border:1px solid var(--border-color);">
+                            <strong style="color:var(--text-main);">Drill 2: Diminished 7th Slide (Minor 3rds)</strong>
+                            <p style="font-size:0.85rem; color:var(--text-muted); margin-top:4px;">
+                                Take a standard Diminished 7th shape and shift it 3 frets up continuously. Notice how the notes remain identical!
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </main>
+
+    <script>
+        /**
+         * MUSIC THEORY DATA & ENGINE
+         */
+        const KEYS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+        const CANONICAL_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+
+        const PITCH_CLASSES = {
+            'C':0, 'C#':1, 'Db':1, 'D':2, 'D#':3, 'Eb':3,
+            'E':4, 'F':5, 'F#':6, 'Gb':6, 'G':7, 'G#':8,
+            'Ab':8, 'A':9, 'A#':10, 'Bb':10, 'B':11
+        };
+
+        const TUNING = [
+            { name: 'E', midi: 64 }, // String 1 (High E)
+            { name: 'B', midi: 59 }, // String 2
+            { name: 'G', midi: 55 }, // String 3
+            { name: 'D', midi: 50 }, // String 4
+            { name: 'A', midi: 45 }, // String 5
+            { name: 'E', midi: 40 }  // String 6 (Low E)
+        ];
+
+        const TOTAL_FRETS = 24;
+
+        // State Management
+        const state = {
+            rootKey: 'C',
+            mode: 'maj3',
+            subcycleIdx: 0,
+            tempo: 120,
+            volume: 0.7,
+            isPlaying: false
+        };
+
+        /**
+         * WEB AUDIO SYNTH
+         */
+        class WebAudioEngine {
+            constructor() {
+                this.ctx = null;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                    this.ctx = new AudioContextClass();
+                }
+                if (this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+
+            playMidiNote(midiNote, duration = 1.2, timeOffset = 0) {
+                this.init();
+                const now = this.ctx.currentTime + timeOffset;
+                const freq = 440 * Math.pow(2, (midiNote - 69) / 12);
+
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(freq, now);
+
+                const vol = state.volume;
+                gain.gain.setValueAtTime(0.001, now);
+                gain.gain.linearRampToValueAtTime(0.25 * vol, now + 0.03);
+                gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.start(now);
+                osc.stop(now + duration);
+            }
+
+            playChord(midiNotes, duration = 1.4, stagger = 0.03, timeOffset = 0) {
+                midiNotes.forEach((midi, idx) => {
+                    this.playMidiNote(midi, duration, timeOffset + idx * stagger);
+                });
+            }
+        }
+
+        const audio = new WebAudioEngine();
+
+        /**
+         * TAB SWITCHING LOGIC
+         */
+        function switchTab(tabId) {
+            document.querySelectorAll('.nav-tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.view-page').forEach(page => page.classList.remove('active-view'));
+
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+            document.getElementById(`page-${tabId}`).classList.add('active-view');
+        }
+
+        /**
+         * CYCLE CALCULATIONS
+         */
+        function getCurrentCycleData() {
+            const rootPitch = PITCH_CLASSES[state.rootKey];
+
+            if (state.mode === 'maj3') {
+                // Major 3rd Cycles (4 semitones)
+                const pitches = [
+                    rootPitch,
+                    (rootPitch + 4) % 12,
+                    (rootPitch + 8) % 12
+                ];
+                const notes = pitches.map(p => CANONICAL_NAMES[p]);
+                return {
+                    title: `Major 3rd Cycle (${notes.join(' - ')})`,
+                    formula: notes.join(' - ') + ' - ' + notes[0],
+                    description: "Augmented triad family dividing the octave into 3 equal parts of 4 semitones. Key driver of Coltrane changes.",
+                    pitches: pitches,
+                    notes: notes,
+                    type: 'maj3'
+                };
+            } else if (state.mode === 'min3') {
+                // Minor 3rd Cycles (3 semitones)
+                const pitches = [
+                    rootPitch,
+                    (rootPitch + 3) % 12,
+                    (rootPitch + 6) % 12,
+                    (rootPitch + 9) % 12
+                ];
+                const notes = pitches.map(p => CANONICAL_NAMES[p]);
+                return {
+                    title: `Minor 3rd Cycle (${notes.join(' - ')})`,
+                    formula: notes.join(' - ') + ' - ' + notes[0],
+                    description: "Diminished 7th family dividing the octave into 4 equal parts of 3 semitones. Essential for octatonic scale structures.",
+                    pitches: pitches,
+                    notes: notes,
+                    type: 'min3'
+                };
+            } else {
+                // Chromatic Mediants
+                const pitches = [
+                    rootPitch,
+                    (rootPitch + 4) % 12,  // Major 3rd Up
+                    (rootPitch + 8) % 12,  // Major 3rd Down (Aug 5th)
+                    (rootPitch + 3) % 12   // Minor 3rd Up
+                ];
+                const notes = pitches.map(p => CANONICAL_NAMES[p]);
+                return {
+                    title: `Chromatic Mediant Network from ${state.rootKey}`,
+                    formula: `${notes[0]} Major ↔ ${notes[1]} Major / ${notes[2]} Major / ${notes[3]} Major`,
+                    description: "Chords sharing 3rd relationships and chord quality. Highly atmospheric cinematic modulation path.",
+                    pitches: pitches,
+                    notes: notes,
+                    type: 'chromatic_mediant'
+                };
+            }
+        }
+
+        /**
+         * SVG CIRCLE RENDERER
+         */
+        function renderWheel(cycleData) {
+            const svg = document.getElementById('thirds-wheel');
+            const centerX = 150;
+            const centerY = 150;
+            const radius = 110;
+
+            let html = '';
+
+            // Outer Circle Ring
+            html += `<circle cx="${centerX}" cy="${centerY}" r="${radius}" fill="none" stroke="#2a3b5c" stroke-width="2" />`;
+
+            // Draw Cycle Connector Path
+            const points = cycleData.pitches.map(p => {
+                const angle = (p * 30 - 90) * (Math.PI / 180);
+                return {
+                    x: centerX + radius * Math.cos(angle),
+                    y: centerY + radius * Math.sin(angle)
+                };
+            });
+
+            if (points.length > 0) {
+                let d = `M ${points[0].x} ${points[0].y}`;
+                for (let i = 1; i < points.length; i++) {
+                    d += ` L ${points[i].x} ${points[i].y}`;
+                }
+                d += ' Z';
+
+                const strokeColor = cycleData.type === 'maj3' ? 'var(--color-maj3)' : (cycleData.type === 'min3' ? 'var(--color-min3)' : 'var(--color-dim)');
+                html += `<path d="${d}" class="cycle-link-path" stroke="${strokeColor}" fill="${strokeColor}" fill-opacity="0.12" />`;
+            }
+
+            // Draw 12 Clock Nodes
+            for (let i = 0; i < 12; i++) {
+                const angle = (i * 30 - 90) * (Math.PI / 180);
+                const x = centerX + radius * Math.cos(angle);
+                const y = centerY + radius * Math.sin(angle);
+
+                const noteName = CANONICAL_NAMES[i];
+                const isSelected = cycleData.pitches.includes(i);
+                const isRoot = (i === PITCH_CLASSES[state.rootKey]);
+
+                let nodeColor = '#1e293b';
+                let strokeColor = '#475569';
+
+                if (isRoot) {
+                    nodeColor = 'var(--color-root)';
+                    strokeColor = '#ffffff';
+                } else if (isSelected) {
+                    nodeColor = cycleData.type === 'maj3' ? 'var(--color-maj3)' : 'var(--color-min3)';
+                    strokeColor = '#ffffff';
+                }
+
+                html += `
+                    <g class="wheel-node" onclick="handleNodeClick('${noteName}', ${i})">
+                        <circle cx="${x}" cy="${y}" r="${isSelected ? 16 : 12}" fill="${nodeColor}" stroke="${strokeColor}" stroke-width="${isSelected ? 2.5 : 1}" />
+                        <text x="${x}" y="${y}" class="wheel-label">${noteName}</text>
+                    </g>
+                `;
+            }
+
+            svg.innerHTML = html;
+        }
+
+        function handleNodeClick(noteName, pitchIdx) {
+            state.rootKey = noteName;
+            document.getElementById('select-root').value = noteName;
+            audio.playMidiNote(60 + pitchIdx);
+            updateApp();
+        }
+
+        /**
+         * FRETBOARD RENDERER
+         */
+        function renderFretNumbers() {
+            const container = document.getElementById('fret-numbers');
+            let html = '<div class="fret-number-cell nut">Nut</div>';
+            for (let f = 1; f <= TOTAL_FRETS; f++) {
+                html += `<div class="fret-number-cell">${f}</div>`;
+            }
+            container.innerHTML = html;
+        }
+
+        function renderInlays() {
+            const container = document.getElementById('inlay-layer');
+            const singleInlays = [3, 5, 7, 9, 15, 17, 19, 21];
+            const doubleInlays = [12, 24];
+
+            let html = '';
+            for (let f = 1; f <= TOTAL_FRETS; f++) {
+                html += '<div class="inlay-cell">';
+                if (singleInlays.includes(f)) {
+                    html += '<div class="inlay-dot"></div>';
+                } else if (doubleInlays.includes(f)) {
+                    html += '<div class="inlay-double"><div class="inlay-dot"></div><div class="inlay-dot"></div></div>';
+                }
+                html += '</div>';
+            }
+            container.innerHTML = html;
+        }
+
+        function renderFretboard(cycleData) {
+            const container = document.getElementById('strings-container');
+            let html = '';
+
+            for (let sIdx = 0; sIdx < 6; sIdx++) {
+                const tuningObj = TUNING[sIdx];
+                const wireThickness = (sIdx + 1) * 0.5 + 1.2;
+
+                html += `<div class="string-row">`;
+                html += `<div class="string-wire" style="height: ${wireThickness}px;"></div>`;
+                html += `<div class="tuning-label">${tuningObj.name}</div>`;
+
+                for (let f = 0; f <= TOTAL_FRETS; f++) {
+                    const noteMidi = tuningObj.midi + f;
+                    const pitch = noteMidi % 12;
+                    const isCycleNote = cycleData.pitches.includes(pitch);
+                    const isRoot = (pitch === PITCH_CLASSES[state.rootKey]);
+
+                    const cellClass = (f === 0) ? 'fret-cell nut-cell' : 'fret-cell';
+
+                    html += `<div class="${cellClass}">`;
+                    if (isCycleNote) {
+                        const noteName = CANONICAL_NAMES[pitch];
+                        let badgeBg = cycleData.type === 'maj3' ? 'var(--color-maj3)' : 'var(--color-min3)';
+                        if (isRoot) badgeBg = 'var(--color-root)';
+
+                        html += `<div class="note-badge" style="background-color: ${badgeBg};" onclick="audio.playMidiNote(${noteMidi})">${noteName}</div>`;
+                    }
+                    html += `</div>`;
+                }
+
+                html += `</div>`;
+            }
+
+            container.innerHTML = html;
+        }
+
+        /**
+         * CHORD CARDS RENDERER
+         */
+        function renderChordCards(cycleData) {
+            const container = document.getElementById('cards-grid');
+            const countBadge = document.getElementById('cards-count');
+
+            const rootPitch = PITCH_CLASSES[state.rootKey];
+            let cards = [];
+
+            if (cycleData.type === 'maj3') {
+                cards = cycleData.notes.map((note, idx) => {
+                    const midi = 60 + cycleData.pitches[idx];
+                    return {
+                        title: `${note} Aug Triad`,
+                        tag: 'Maj 3rd Center',
+                        notes: `${note} - ${CANONICAL_NAMES[(cycleData.pitches[idx]+4)%12]} - ${CANONICAL_NAMES[(cycleData.pitches[idx]+8)%12]}`,
+                        midi: [midi, midi+4, midi+8]
+                    };
+                });
+            } else if (cycleData.type === 'min3') {
+                cards = cycleData.notes.map((note, idx) => {
+                    const midi = 60 + cycleData.pitches[idx];
+                    return {
+                        title: `${note} Dim 7th`,
+                        tag: 'Min 3rd Center',
+                        notes: `${note} - ${CANONICAL_NAMES[(cycleData.pitches[idx]+3)%12]} - ${CANONICAL_NAMES[(cycleData.pitches[idx]+6)%12]} - ${CANONICAL_NAMES[(cycleData.pitches[idx]+9)%12]}`,
+                        midi: [midi, midi+3, midi+6, midi+9]
+                    };
+                });
+            } else {
+                cards = cycleData.notes.map((note, idx) => {
+                    const midi = 60 + cycleData.pitches[idx];
+                    return {
+                        title: `${note} Major`,
+                        tag: idx === 0 ? 'Home Key' : 'Chromatic Mediant',
+                        notes: `${note} - ${CANONICAL_NAMES[(cycleData.pitches[idx]+4)%12]} - ${CANONICAL_NAMES[(cycleData.pitches[idx]+7)%12]}`,
+                        midi: [midi, midi+4, midi+7]
+                    };
+                });
+            }
+
+            countBadge.textContent = `${cards.length} Voicings`;
+
+            container.innerHTML = cards.map(c => `
+                <div class="chord-card">
+                    <div class="card-header">
+                        <span class="card-title">${c.title}</span>
+                        <span class="card-tag">${c.tag}</span>
+                    </div>
+                    <div class="card-body">${c.notes}</div>
+                    <button style="align-self: flex-start; margin-top: 4px; padding: 4px 10px; font-size: 0.75rem;" onclick='audio.playChord([${c.midi.join(',')}])'>▶ Play Chord</button>
+                </div>
+            `).join('');
+        }
+
+        /**
+         * AUDIO DEMOS FOR TUTORIAL PAGE
+         */
+        function playDemoColtrane() {
+            // Bmaj7 (71, 75, 78, 82) -> D7 (62, 66, 69, 72) -> Gmaj7 (67, 71, 74, 78) -> Bb7 (60, 64, 67, 70) -> Ebmaj7 (63, 67, 70, 74)
+            audio.playChord([71, 75, 78, 82], 1.2, 0.03, 0.0);
+            audio.playChord([62, 66, 69, 72], 1.2, 0.03, 1.0);
+            audio.playChord([67, 71, 74, 78], 1.2, 0.03, 2.0);
+            audio.playChord([60, 64, 67, 70], 1.2, 0.03, 3.0);
+            audio.playChord([63, 67, 70, 74], 1.6, 0.03, 4.0);
+        }
+
+        function playDemoFilm() {
+            // C Major (60, 64, 67) -> E Major (64, 68, 71) -> Ab Major (68, 72, 75) -> C Major (60, 64, 67)
+            audio.playChord([60, 64, 67], 1.4, 0.04, 0.0);
+            audio.playChord([64, 68, 71], 1.4, 0.04, 1.4);
+            audio.playChord([68, 72, 75], 1.4, 0.04, 2.8);
+            audio.playChord([60, 64, 67], 1.8, 0.04, 4.2);
+        }
+
+        /**
+         * MAIN UPDATE CONTROLLER
+         */
+        function updateApp() {
+            const cycleData = getCurrentCycleData();
+
+            document.getElementById('cycle-title-text').textContent = cycleData.title;
+            document.getElementById('cycle-formula-text').textContent = cycleData.formula;
+            document.getElementById('cycle-description-text').textContent = cycleData.description;
+
+            renderWheel(cycleData);
+            renderFretboard(cycleData);
+            renderChordCards(cycleData);
+        }
+
+        /**
+         * INIT LISTENERS
+         */
+        window.addEventListener('DOMContentLoaded', () => {
+            const rootSelect = document.getElementById('select-root');
+            rootSelect.innerHTML = KEYS.map(k => `<option value="${k}">${k}</option>`).join('');
+            rootSelect.value = state.rootKey;
+
+            renderFretNumbers();
+            renderInlays();
+            updateApp();
+
+            rootSelect.addEventListener('change', (e) => {
+                state.rootKey = e.target.value;
+                updateApp();
+            });
+
+            document.getElementById('select-mode').addEventListener('change', (e) => {
+                state.mode = e.target.value;
+                updateApp();
+            });
+
+            document.getElementById('btn-play-cycle').addEventListener('click', () => {
+                const cycleData = getCurrentCycleData();
+                const stepDelay = 60 / state.tempo;
+                cycleData.pitches.forEach((p, idx) => {
+                    const midi = 60 + p;
+                    audio.playChord([midi, midi+4, midi+7], 1.2, 0.03, idx * stepDelay);
+                });
+            });
+
+            document.getElementById('btn-arpeggio').addEventListener('click', () => {
+                const cycleData = getCurrentCycleData();
+                cycleData.pitches.forEach((p, idx) => {
+                    audio.playMidiNote(60 + p, 1.0, idx * 0.25);
+                });
+            });
+
+            document.getElementById('tempo-slider').addEventListener('input', (e) => {
+                state.tempo = parseInt(e.target.value);
+                document.getElementById('bpm-badge').textContent = `${state.tempo} BPM`;
+            });
+        });
+    </script>
+</body>
+</html>
